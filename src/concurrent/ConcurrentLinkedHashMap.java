@@ -1,11 +1,13 @@
 package concurrent;
 
+import com.sun.istack.internal.NotNull;
+import concurrent.ConcurrentLinkedDeque.Node;
+import concurrent.util.Pair;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import concurrent.ConcurrentLinkedDeque.Node;
-import concurrent.util.Pair;
 
 
 public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
@@ -15,6 +17,7 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
     private static final float  DEFAULT_LOAD_FACTOR         = ConcurrentHashMap.DEFAULT_LOAD_FACTOR;
 
 
+    @SuppressWarnings("unused")
     public ConcurrentLinkedHashMap()
     {
         this(
@@ -40,8 +43,8 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
                                    boolean accessOrder)
     {
         this.accessOrder_   = accessOrder;
-        this.storage_       = new ConcurrentHashMap<K, Pair<Node<K>, V>>(initialCapacity, loadFactor, concurrencyLevel);
-        this.MRU_           = new TConcurrentLinkedDeque();
+        this.storage_       = new ConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
+        this.MRU_           = new TConcurrentLinkedDeque<>();
     }
 
 
@@ -52,7 +55,7 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
         if (e != null && accessOrder_)
             e._1 = MRU_.moveLast(e._1);
         return e != null ? e._2 : null;
-    };
+    }
 
     @Override
     public int size() {
@@ -81,22 +84,22 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
         MRU_.clear();
     }
 
-    @Override
+    @Override @NotNull
     public Set<K> keySet() {
         // FIXME
-        return null;
+        throw new RuntimeException();
     }
 
-    @Override
+    @Override @NotNull
     public Collection<V> values() {
         // FIXME
-        return null;
+        throw new RuntimeException();
     }
 
-    @Override
+    @Override @NotNull
     public Set<Entry<K, V>> entrySet() {
         // FIXME
-        return null;
+        throw new RuntimeException();
     }
 
     @SuppressWarnings("unchecked")
@@ -124,12 +127,13 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         // FIXME
+        throw new RuntimeException();
     }
 
-    @SuppressWarnings("unchecked")
+    @Override @NotNull
     public V putIfAbsent(K key, V value) {
         // FIXME
-        return null;
+        throw new RuntimeException();
     }
 
     @Override
@@ -146,13 +150,13 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
     @Override
     public boolean replace(K key, V oldValue, V newValue) {
         // FIXME
-        return false;
+        throw new RuntimeException();
     }
 
     @Override
     public V replace(K key, V value) {
         // FIXME
-        return null;
+        throw new RuntimeException();
     }
 
 
