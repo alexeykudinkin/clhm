@@ -1,6 +1,8 @@
 import concurrent.ConcurrentLinkedHashMap;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Main {
 
@@ -11,59 +13,60 @@ public class Main {
     private static final long REMOVE_OPS = 10000;
 
 
-    private static final long READ_OPS = 100000000;
-    private static final long WRITE_OPS = 10000000;
+    private static final long READ_OPS = 1000000;
+    private static final long WRITE_OPS = 100000;
 
-    private static final int READERS = 64;
-    private static final int WRITERS = 16;
+    private static final int READERS = 32;
+    private static final int WRITERS = 4;
+
+    private static final int SIZE_THRESHOLD = 10000;
+
 
     public static void main(String[] args) {
 
-        List<Map> targets = new ArrayList<Map>();
+        Map<String, Map> targets = new LinkedHashMap<>();
 
-        targets.add(
-            new ConcurrentLinkedHashMap<Integer, Integer>(16, 0.75f, false) {
-                @Override
-                protected boolean removeEldestEntryForKey(Integer key) {
-                    if (size() > 10000)
-                        return true;
-                    return false;
-                }
-            }
-        );
-
-        targets.add(
-                Collections.synchronizedMap(
-                    new LinkedHashMap<Integer, Integer>(16, 0.75f, false) {
-                        @Override
-                        protected boolean removeEldestEntry(Map.Entry<Integer, Integer> e) {
-                            if (size() > 10000)
-                                return true;
-                            return false;
-                        }
+        targets.put(
+                ConcurrentLinkedHashMap.class.getName(),
+                new ConcurrentLinkedHashMap<Integer, Integer>(16, 0.75f, false) {
+                    @Override
+                    protected boolean removeEldestEntryForKey(Integer key) {
+                        return size() > SIZE_THRESHOLD;
                     }
-                )
+                }
+        );
+
+        targets.put(
+            LinkedHashMap.class.getName(),
+            Collections.synchronizedMap(
+                new LinkedHashMap<Integer, Integer>(16, 0.75f, false) {
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> e) {
+                        return size() > SIZE_THRESHOLD;
+                    }
+                }
+            )
         );
 
 
         //
-        // ...
+        // LOAD TESTING
         //
 
-        for (int i=0; i < targets.size(); ++i) {
+        for (Map.Entry<String, Map> target : targets.entrySet()) {
 
             System.out.println("            ");
             System.out.println("============");
-            System.out.println("TARGET #" + i);
+            System.out.println("TARGET #" + target.getKey());
             System.out.println("============");
             System.out.println("            ");
 
-            LoadHarness loader = new LoadHarness(targets.get(i), WRITERS, READERS, WRITE_OPS, READ_OPS);
+            LoadTestbed loader = new LoadTestbed(target.getValue(), WRITERS, READERS, WRITE_OPS, READ_OPS);
 
             loader.run();
 
-            System.out.println("AVERAGE RDL: " + loader.getAverageReadingLatency());
-            System.out.println("AVERAGE WRL: " + loader.getAverageWritingLatency());
+            System.out.println("AVERAGE RDL: " + loader.getAverageReadingLatency() + " ns.");
+            System.out.println("AVERAGE WRL: " + loader.getAverageWritingLatency() + " ns.");
 
         }
 
