@@ -1,4 +1,4 @@
-package concurrent.util;
+package util;
 
 public class Pair<A, B> {
 

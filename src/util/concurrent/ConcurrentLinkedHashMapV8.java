@@ -1,8 +1,8 @@
-package concurrent;
+package util.concurrent;
 
-import com.sun.istack.internal.NotNull;
-import concurrent.ConcurrentLinkedDeque.Node;
-import concurrent.util.Pair;
+import util.Pair;
+import util.concurrent.ConcurrentLinkedDeque.Node;
+import util.concurrent.jsr166e.ConcurrentHashMapV8;
 
 import java.util.Collection;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 
-public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
+public class ConcurrentLinkedHashMapV8<K, V> implements ConcurrentMap<K, V> {
 
     private static final int    DEFAULT_INITIAL_CAPACITY    = ConcurrentHashMap.DEFAULT_INITIAL_CAPACITY;
     private static final int    DEFAULT_CONCURRENCY_LEVEL   = ConcurrentHashMap.DEFAULT_CONCURRENCY_LEVEL;
@@ -18,7 +18,7 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
 
 
     @SuppressWarnings("unused")
-    public ConcurrentLinkedHashMap()
+    public ConcurrentLinkedHashMapV8()
     {
         this(
             DEFAULT_INITIAL_CAPACITY,
@@ -27,7 +27,7 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
         );
     }
 
-    public ConcurrentLinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)
+    public ConcurrentLinkedHashMapV8(int initialCapacity, float loadFactor, boolean accessOrder)
     {
         this(
             initialCapacity,
@@ -37,13 +37,13 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
         );
     }
 
-    public ConcurrentLinkedHashMap(int initialCapacity,
-                                   int concurrencyLevel,
-                                   float loadFactor,
-                                   boolean accessOrder)
+    public ConcurrentLinkedHashMapV8(int initialCapacity,
+                                     int concurrencyLevel,
+                                     float loadFactor,
+                                     boolean accessOrder)
     {
         this.accessOrder_   = accessOrder;
-        this.storage_       = new ConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
+        this.storage_       = new ConcurrentHashMapV8<>(initialCapacity, loadFactor, concurrencyLevel);
         this.MRU_           = new TConcurrentLinkedDeque<>();
     }
 
@@ -84,25 +84,22 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
         MRU_.clear();
     }
 
-    @Override @NotNull
     public Set<K> keySet() {
         // FIXME
         throw new RuntimeException();
     }
 
-    @Override @NotNull
     public Collection<V> values() {
         // FIXME
         throw new RuntimeException();
     }
 
-    @Override @NotNull
     public Set<Entry<K, V>> entrySet() {
         // FIXME
         throw new RuntimeException();
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public V put(K key, V value) {
         if (removeEldestEntryForKey(key)) {
             // Discard request in the case of the MRU-cache being empty
@@ -130,7 +127,6 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
         throw new RuntimeException();
     }
 
-    @Override @NotNull
     public V putIfAbsent(K key, V value) {
         // FIXME
         throw new RuntimeException();
@@ -188,7 +184,7 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    private final ConcurrentHashMap<K, Pair<Node<K>, V>> storage_;
+    private final ConcurrentHashMapV8<K, Pair<Node<K>, V>> storage_;
 
     private final TConcurrentLinkedDeque<K> MRU_;
 

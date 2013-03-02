@@ -1,6 +1,5 @@
-package concurrent;
+package util.concurrent;
 
-import concurrent.ConcurrentLinkedDeque;
 
 public class TConcurrentLinkedDeque<E> extends ConcurrentLinkedDeque<E> {
 

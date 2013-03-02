@@ -1,39 +1,39 @@
 /*
- * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 /*
- *
- *
- *
- *
+ * This file is available under and governed by the GNU General Public
+ * License version 2 only, as published by the Free Software Foundation.
+ * However, the following notice accompanied the original version of this
+ * file:
  *
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-package concurrent;
+package util.concurrent;
 
 import sun.misc.Unsafe;
 
@@ -43,7 +43,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
-
 
 /**
  * A hash table supporting full concurrency of retrievals and
@@ -66,7 +65,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * removal of only some entries.  Similarly, Iterators and
  * Enumerations return elements reflecting the state of the hash table
  * at some point at or since the creation of the iterator/enumeration.
- * They do <em>not</em> throw {@link java.util.ConcurrentModificationException}.
+ * They do <em>not</em> throw {@link ConcurrentModificationException}.
  * However, iterators are designed to be used by only one thread at a time.
  *
  * <p> The allowed concurrency among update operations is guided by
@@ -88,10 +87,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * constructors.
  *
  * <p>This class and its views and iterators implement all of the
- * <em>optional</em> methods of the {@link java.util.Map} and {@link java.util.Iterator}
+ * <em>optional</em> methods of the {@link Map} and {@link Iterator}
  * interfaces.
  *
- * <p> Like {@link java.util.Hashtable} but unlike {@link java.util.HashMap}, this class
+ * <p> Like {@link Hashtable} but unlike {@link HashMap}, this class
  * does <em>not</em> allow <tt>null</tt> to be used as a key or value.
  *
  * <p>This class is a member of the
@@ -187,21 +186,21 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     private static class Holder {
 
         /**
-         * Enable alternative hashing of String keys?
-         *
-         * <p>Unlike the other hash map implementations we do not implement a
-         * threshold for regulating whether alternative hashing is used for
-         * String keys. Alternative hashing is either enabled for all instances
-         * or disabled for all instances.
-         */
+        * Enable alternative hashing of String keys?
+        *
+        * <p>Unlike the other hash map implementations we do not implement a
+        * threshold for regulating whether alternative hashing is used for
+        * String keys. Alternative hashing is either enabled for all instances
+        * or disabled for all instances.
+        */
         static final boolean ALTERNATIVE_HASHING;
 
         static {
             // Use the "threshold" system property even though our threshold
             // behaviour is "ON" or "OFF".
             String altThreshold = java.security.AccessController.doPrivileged(
-                    new sun.security.action.GetPropertyAction(
-                            "jdk.map.althashing.threshold"));
+                new sun.security.action.GetPropertyAction(
+                    "jdk.map.althashing.threshold"));
 
             int threshold;
             try {
@@ -291,7 +290,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                 UNSAFE = getUnsafe();
                 Class k = HashEntry.class;
                 nextOffset = UNSAFE.objectFieldOffset
-                        (k.getDeclaredField("next"));
+                    (k.getDeclaredField("next"));
             } catch (Exception e) {
                 throw new Error(e);
             }
@@ -306,8 +305,8 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     @SuppressWarnings("unchecked")
     static final <K,V> HashEntry<K,V> entryAt(HashEntry<K,V>[] tab, int i) {
         return (tab == null) ? null :
-                (HashEntry<K,V>) UNSAFE.getObjectVolatile
-                        (tab, ((long)i << TSHIFT) + TBASE);
+            (HashEntry<K,V>) UNSAFE.getObjectVolatile
+            (tab, ((long)i << TSHIFT) + TBASE);
     }
 
     /**
@@ -387,7 +386,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
          * nodes.
          */
         static final int MAX_SCAN_RETRIES =
-                Runtime.getRuntime().availableProcessors() > 1 ? 64 : 1;
+            Runtime.getRuntime().availableProcessors() > 1 ? 64 : 1;
 
         /**
          * The per-segment table. Elements are accessed via
@@ -433,7 +432,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
 
         final V put(K key, int hash, V value, boolean onlyIfAbsent) {
             HashEntry<K,V> node = tryLock() ? null :
-                    scanAndLockForPut(key, hash, value);
+                scanAndLockForPut(key, hash, value);
             V oldValue;
             try {
                 HashEntry<K,V>[] tab = table;
@@ -443,7 +442,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                     if (e != null) {
                         K k;
                         if ((k = e.key) == key ||
-                                (e.hash == hash && key.equals(k))) {
+                            (e.hash == hash && key.equals(k))) {
                             oldValue = e.value;
                             if (!onlyIfAbsent) {
                                 e.value = value;
@@ -502,7 +501,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             int newCapacity = oldCapacity << 1;
             threshold = (int)(newCapacity * loadFactor);
             HashEntry<K,V>[] newTable =
-                    (HashEntry<K,V>[]) new HashEntry[newCapacity];
+                (HashEntry<K,V>[]) new HashEntry[newCapacity];
             int sizeMask = newCapacity - 1;
             for (int i = 0; i < oldCapacity ; i++) {
                 HashEntry<K,V> e = oldTable[i];
@@ -574,7 +573,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                     break;
                 }
                 else if ((retries & 1) == 0 &&
-                        (f = entryForHash(this, hash)) != first) {
+                         (f = entryForHash(this, hash)) != first) {
                     e = first = f; // re-traverse if entry changed
                     retries = -1;
                 }
@@ -607,7 +606,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                     break;
                 }
                 else if ((retries & 1) == 0 &&
-                        (f = entryForHash(this, hash)) != first) {
+                         (f = entryForHash(this, hash)) != first) {
                     e = first = f;
                     retries = -1;
                 }
@@ -630,7 +629,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                     K k;
                     HashEntry<K,V> next = e.next;
                     if ((k = e.key) == key ||
-                            (e.hash == hash && key.equals(k))) {
+                        (e.hash == hash && key.equals(k))) {
                         V v = e.value;
                         if (value == null || value == v || value.equals(v)) {
                             if (pred == null)
@@ -661,7 +660,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                 for (e = entryForHash(this, hash); e != null; e = e.next) {
                     K k;
                     if ((k = e.key) == key ||
-                            (e.hash == hash && key.equals(k))) {
+                        (e.hash == hash && key.equals(k))) {
                         if (oldValue.equals(e.value)) {
                             e.value = newValue;
                             ++modCount;
@@ -685,7 +684,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
                 for (e = entryForHash(this, hash); e != null; e = e.next) {
                     K k;
                     if ((k = e.key) == key ||
-                            (e.hash == hash && key.equals(k))) {
+                        (e.hash == hash && key.equals(k))) {
                         oldValue = e.value;
                         e.value = value;
                         ++modCount;
@@ -726,7 +725,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     static final <K,V> Segment<K,V> segmentAt(Segment<K,V>[] ss, int j) {
         long u = (j << SSHIFT) + SBASE;
         return ss == null ? null :
-                (Segment<K,V>) UNSAFE.getObjectVolatile(ss, u);
+            (Segment<K,V>) UNSAFE.getObjectVolatile(ss, u);
     }
 
     /**
@@ -748,10 +747,10 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             int threshold = (int)(cap * lf);
             HashEntry<K,V>[] tab = (HashEntry<K,V>[])new HashEntry[cap];
             if ((seg = (Segment<K,V>)UNSAFE.getObjectVolatile(ss, u))
-                    == null) { // recheck
+                == null) { // recheck
                 Segment<K,V> s = new Segment<K,V>(lf, threshold, tab);
                 while ((seg = (Segment<K,V>)UNSAFE.getObjectVolatile(ss, u))
-                        == null) {
+                       == null) {
                     if (UNSAFE.compareAndSwapObject(ss, u, null, seg = s))
                         break;
                 }
@@ -778,8 +777,8 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     static final <K,V> HashEntry<K,V> entryForHash(Segment<K,V> seg, int h) {
         HashEntry<K,V>[] tab;
         return (seg == null || (tab = seg.table) == null) ? null :
-                (HashEntry<K,V>) UNSAFE.getObjectVolatile
-                        (tab, ((long)(((tab.length - 1) & h)) << TSHIFT) + TBASE);
+            (HashEntry<K,V>) UNSAFE.getObjectVolatile
+            (tab, ((long)(((tab.length - 1) & h)) << TSHIFT) + TBASE);
     }
 
     /* ---------------- Public operations -------------- */
@@ -826,8 +825,8 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             cap <<= 1;
         // create segments and segments[0]
         Segment<K,V> s0 =
-                new Segment<K,V>(loadFactor, (int)(cap * loadFactor),
-                        (HashEntry<K,V>[])new HashEntry[cap]);
+            new Segment<K,V>(loadFactor, (int)(cap * loadFactor),
+                             (HashEntry<K,V>[])new HashEntry[cap]);
         Segment<K,V>[] ss = (Segment<K,V>[])new Segment[ssize];
         UNSAFE.putOrderedObject(ss, SBASE, s0); // ordered write of segments[0]
         this.segments = ss;
@@ -882,8 +881,8 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      */
     public ConcurrentHashMap(Map<? extends K, ? extends V> m) {
         this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1,
-                DEFAULT_INITIAL_CAPACITY),
-                DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
+                      DEFAULT_INITIAL_CAPACITY),
+             DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
         putAll(m);
     }
 
@@ -991,9 +990,9 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         int h = hash(key);
         long u = (((h >>> segmentShift) & segmentMask) << SSHIFT) + SBASE;
         if ((s = (Segment<K,V>)UNSAFE.getObjectVolatile(segments, u)) != null &&
-                (tab = s.table) != null) {
+            (tab = s.table) != null) {
             for (HashEntry<K,V> e = (HashEntry<K,V>) UNSAFE.getObjectVolatile
-                    (tab, ((long)(((tab.length - 1) & h)) << TSHIFT) + TBASE);
+                     (tab, ((long)(((tab.length - 1) & h)) << TSHIFT) + TBASE);
                  e != null; e = e.next) {
                 K k;
                 if ((k = e.key) == key || (e.hash == h && key.equals(k)))
@@ -1019,9 +1018,9 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         int h = hash(key);
         long u = (((h >>> segmentShift) & segmentMask) << SSHIFT) + SBASE;
         if ((s = (Segment<K,V>)UNSAFE.getObjectVolatile(segments, u)) != null &&
-                (tab = s.table) != null) {
+            (tab = s.table) != null) {
             for (HashEntry<K,V> e = (HashEntry<K,V>) UNSAFE.getObjectVolatile
-                    (tab, ((long)(((tab.length - 1) & h)) << TSHIFT) + TBASE);
+                     (tab, ((long)(((tab.length - 1) & h)) << TSHIFT) + TBASE);
                  e != null; e = e.next) {
                 K k;
                 if ((k = e.key) == key || (e.hash == h && key.equals(k)))
@@ -1128,7 +1127,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         int hash = hash(key);
         int j = (hash >>> segmentShift) & segmentMask;
         if ((s = (Segment<K,V>)UNSAFE.getObject          // nonvolatile; recheck
-                (segments, (j << SSHIFT) + SBASE)) == null) //  in ensureSegment
+             (segments, (j << SSHIFT) + SBASE)) == null) //  in ensureSegment
             s = ensureSegment(j);
         return s.put(key, hash, value, false);
     }
@@ -1148,7 +1147,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         int hash = hash(key);
         int j = (hash >>> segmentShift) & segmentMask;
         if ((s = (Segment<K,V>)UNSAFE.getObject
-                (segments, (j << SSHIFT) + SBASE)) == null)
+             (segments, (j << SSHIFT) + SBASE)) == null)
             s = ensureSegment(j);
         return s.put(key, hash, value, true);
     }
@@ -1189,7 +1188,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         int hash = hash(key);
         Segment<K,V> s;
         return value != null && (s = segmentForHash(hash)) != null &&
-                s.remove(key, hash, value) != null;
+            s.remove(key, hash, value) != null;
     }
 
     /**
@@ -1243,7 +1242,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * <tt>addAll</tt> operations.
      *
      * <p>The view's <tt>iterator</tt> is a "weakly consistent" iterator
-     * that will never throw {@link java.util.ConcurrentModificationException},
+     * that will never throw {@link ConcurrentModificationException},
      * and guarantees to traverse elements as they existed upon
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
@@ -1264,7 +1263,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * support the <tt>add</tt> or <tt>addAll</tt> operations.
      *
      * <p>The view's <tt>iterator</tt> is a "weakly consistent" iterator
-     * that will never throw {@link java.util.ConcurrentModificationException},
+     * that will never throw {@link ConcurrentModificationException},
      * and guarantees to traverse elements as they existed upon
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
@@ -1285,7 +1284,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * <tt>addAll</tt> operations.
      *
      * <p>The view's <tt>iterator</tt> is a "weakly consistent" iterator
-     * that will never throw {@link java.util.ConcurrentModificationException},
+     * that will never throw {@link ConcurrentModificationException},
      * and guarantees to traverse elements as they existed upon
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
@@ -1338,7 +1337,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             for (;;) {
                 if (nextTableIndex >= 0) {
                     if ((nextEntry = entryAt(currentTable,
-                            nextTableIndex--)) != null)
+                                             nextTableIndex--)) != null)
                         break;
                 }
                 else if (nextSegmentIndex >= 0) {
@@ -1373,16 +1372,16 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     }
 
     final class KeyIterator
-            extends HashIterator
-            implements Iterator<K>, Enumeration<K>
+        extends HashIterator
+        implements Iterator<K>, Enumeration<K>
     {
         public final K next()        { return super.nextEntry().key; }
         public final K nextElement() { return super.nextEntry().key; }
     }
 
     final class ValueIterator
-            extends HashIterator
-            implements Iterator<V>, Enumeration<V>
+        extends HashIterator
+        implements Iterator<V>, Enumeration<V>
     {
         public final V next()        { return super.nextEntry().value; }
         public final V nextElement() { return super.nextEntry().value; }
@@ -1393,7 +1392,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * setValue changes to the underlying map.
      */
     final class WriteThroughEntry
-            extends AbstractMap.SimpleEntry<K,V>
+        extends AbstractMap.SimpleEntry<K,V>
     {
         WriteThroughEntry(K k, V v) {
             super(k,v);
@@ -1417,8 +1416,8 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     }
 
     final class EntryIterator
-            extends HashIterator
-            implements Iterator<Entry<K,V>>
+        extends HashIterator
+        implements Iterator<Entry<K,V>>
     {
         public Map.Entry<K,V> next() {
             HashEntry<K,V> e = super.nextEntry();
@@ -1538,7 +1537,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      */
     @SuppressWarnings("unchecked")
     private void readObject(java.io.ObjectInputStream s)
-            throws IOException, ClassNotFoundException {
+        throws IOException, ClassNotFoundException {
         s.defaultReadObject();
 
         // set hashMask
@@ -1584,7 +1583,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             ts = UNSAFE.arrayIndexScale(tc);
             ss = UNSAFE.arrayIndexScale(sc);
             HASHSEED_OFFSET = UNSAFE.objectFieldOffset(
-                    ConcurrentHashMap.class.getDeclaredField("hashSeed"));
+                ConcurrentHashMap.class.getDeclaredField("hashSeed"));
         } catch (Exception e) {
             throw new Error(e);
         }
@@ -1608,4 +1607,3 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
     }
 
 }
-

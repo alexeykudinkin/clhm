@@ -1,56 +1,50 @@
 /*
- * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
  *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 /*
- *
- *
- *
- *
+ * This file is available under and governed by the GNU General Public
+ * License version 2 only, as published by the Free Software Foundation.
+ * However, the following notice accompanied the original version of this
+ * file:
  *
  * Written by Doug Lea and Martin Buchholz with assistance from members of
  * JCP JSR-166 Expert Group and released to the public domain, as explained
-* at http://creativecommons.org/publicdomain/zero/1.0/
+ * at http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-package concurrent;
-
-import java.lang.reflect.Field;
-import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Queue;
+package util.concurrent;
 
 import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * An unbounded concurrent {@linkplain Deque deque} based on linked nodes.
  * Concurrent insertion, removal, and access operations execute safely
  * across multiple threads.
- * A {@code concurrent.ConcurrentLinkedDeque} is an appropriate choice when
+ * A {@code ConcurrentLinkedDeque} is an appropriate choice when
  * many threads will share access to a common collection.
  * Like most other concurrent collection implementations, this class
  * does not permit the use of {@code null} elements.
@@ -79,10 +73,10 @@ import sun.misc.Unsafe;
  *
  * <p>Memory consistency effects: As with other concurrent collections,
  * actions in a thread prior to placing an object into a
- * {@code concurrent.ConcurrentLinkedDeque}
+ * {@code ConcurrentLinkedDeque}
  * <a href="package-summary.html#MemoryVisibility"><i>happen-before</i></a>
  * actions subsequent to the access or removal of that element from
- * the {@code concurrent.ConcurrentLinkedDeque} in another thread.
+ * the {@code ConcurrentLinkedDeque} in another thread.
  *
  * <p>This class is a member of the
  * <a href="{@docRoot}/../technotes/guides/collections/index.html">
@@ -95,8 +89,8 @@ import sun.misc.Unsafe;
  */
 
 public class ConcurrentLinkedDeque<E>
-        extends AbstractCollection<E>
-        implements Deque<E>, java.io.Serializable {
+    extends AbstractCollection<E>
+    implements Deque<E>, java.io.Serializable {
 
     /*
      * This is an implementation of a concurrent lock-free deque
@@ -340,15 +334,18 @@ public class ConcurrentLinkedDeque<E>
                 UNSAFE = getUnsafe();
                 Class k = Node.class;
                 prevOffset = UNSAFE.objectFieldOffset
-                        (k.getDeclaredField("prev"));
+                    (k.getDeclaredField("prev"));
                 itemOffset = UNSAFE.objectFieldOffset
-                        (k.getDeclaredField("item"));
+                    (k.getDeclaredField("item"));
                 nextOffset = UNSAFE.objectFieldOffset
-                        (k.getDeclaredField("next"));
+                    (k.getDeclaredField("next"));
             } catch (Exception e) {
                 throw new Error(e);
             }
         }
+
+
+
     }
 
     /**
@@ -362,7 +359,7 @@ public class ConcurrentLinkedDeque<E>
         for (;;)
             for (Node<E> h = head, p = h, q;;) {
                 if ((q = p.prev) != null &&
-                        (q = (p = q).prev) != null)
+                    (q = (p = q).prev) != null)
                     // Check for head updates every other hop.
                     // If p == q, we are sure to follow head instead.
                     p = (h != (h = head)) ? h : q;
@@ -395,7 +392,7 @@ public class ConcurrentLinkedDeque<E>
         for (;;)
             for (Node<E> t = tail, p = t, q;;) {
                 if ((q = p.next) != null &&
-                        (q = (p = q).next) != null)
+                    (q = (p = q).next) != null)
                     // Check for tail updates every other hop.
                     // If p == q, we are sure to follow tail instead.
                     p = (t != (t = tail)) ? t : q;
@@ -502,8 +499,8 @@ public class ConcurrentLinkedDeque<E>
 
             // TODO: better HOP heuristics
             if (hops < HOPS
-                    // always squeeze out interior deleted nodes
-                    && (isFirst | isLast))
+                // always squeeze out interior deleted nodes
+                && (isFirst | isLast))
                 return;
 
             // Squeeze out deleted nodes between activePred and
@@ -514,11 +511,11 @@ public class ConcurrentLinkedDeque<E>
             // Try to gc-unlink, if possible
             if ((isFirst | isLast) &&
 
-                    // Recheck expected state of predecessor and successor
-                    (activePred.next == activeSucc) &&
-                    (activeSucc.prev == activePred) &&
-                    (isFirst ? activePred.prev == null : activePred.item != null) &&
-                    (isLast  ? activeSucc.next == null : activeSucc.item != null)) {
+                // Recheck expected state of predecessor and successor
+                (activePred.next == activeSucc) &&
+                (activeSucc.prev == activePred) &&
+                (isFirst ? activePred.prev == null : activePred.item != null) &&
+                (isLast  ? activeSucc.next == null : activeSucc.item != null)) {
 
                 updateHead(); // Ensure x is not reachable from head
                 updateTail(); // Ensure x is not reachable from tail
@@ -542,8 +539,8 @@ public class ConcurrentLinkedDeque<E>
                 if (o != null && p.prev != p && first.casNext(next, p)) {
                     skipDeletedPredecessors(p);
                     if (first.prev == null &&
-                            (p.next == null || p.item != null) &&
-                            p.prev == first) {
+                        (p.next == null || p.item != null) &&
+                        p.prev == first) {
 
                         updateHead(); // Ensure o is not reachable from head
                         updateTail(); // Ensure o is not reachable from tail
@@ -576,8 +573,8 @@ public class ConcurrentLinkedDeque<E>
                 if (o != null && p.next != p && last.casPrev(prev, p)) {
                     skipDeletedSuccessors(p);
                     if (last.next == null &&
-                            (p.prev == null || p.item != null) &&
-                            p.next == last) {
+                        (p.prev == null || p.item != null) &&
+                        p.next == last) {
 
                         updateHead(); // Ensure o is not reachable from head
                         updateTail(); // Ensure o is not reachable from tail
@@ -612,7 +609,7 @@ public class ConcurrentLinkedDeque<E>
         while ((h = head).item == null && (p = h.prev) != null) {
             for (;;) {
                 if ((q = p.prev) == null ||
-                        (q = (p = q).prev) == null) {
+                    (q = (p = q).prev) == null) {
                     // It is possible that p is PREV_TERMINATOR,
                     // but if so, the CAS is guaranteed to fail.
                     if (casHead(h, p))
@@ -642,7 +639,7 @@ public class ConcurrentLinkedDeque<E>
         while ((t = tail).item == null && (p = t.next) != null) {
             for (;;) {
                 if ((q = p.next) == null ||
-                        (q = (p = q).next) == null) {
+                    (q = (p = q).next) == null) {
                     // It is possible that p is NEXT_TERMINATOR,
                     // but if so, the CAS is guaranteed to fail.
                     if (casTail(t, p))
@@ -752,14 +749,14 @@ public class ConcurrentLinkedDeque<E>
         for (;;)
             for (Node<E> h = head, p = h, q;;) {
                 if ((q = p.prev) != null &&
-                        (q = (p = q).prev) != null)
+                    (q = (p = q).prev) != null)
                     // Check for head updates every other hop.
                     // If p == q, we are sure to follow head instead.
                     p = (h != (h = head)) ? h : q;
                 else if (p == h
-                        // It is possible that p is PREV_TERMINATOR,
-                        // but if so, the CAS is guaranteed to fail.
-                        || casHead(h, p))
+                         // It is possible that p is PREV_TERMINATOR,
+                         // but if so, the CAS is guaranteed to fail.
+                         || casHead(h, p))
                     return p;
                 else
                     continue restartFromHead;
@@ -777,14 +774,14 @@ public class ConcurrentLinkedDeque<E>
         for (;;)
             for (Node<E> t = tail, p = t, q;;) {
                 if ((q = p.next) != null &&
-                        (q = (p = q).next) != null)
+                    (q = (p = q).next) != null)
                     // Check for tail updates every other hop.
                     // If p == q, we are sure to follow tail instead.
                     p = (t != (t = tail)) ? t : q;
                 else if (p == t
-                        // It is possible that p is NEXT_TERMINATOR,
-                        // but if so, the CAS is guaranteed to fail.
-                        || casTail(t, p))
+                         // It is possible that p is NEXT_TERMINATOR,
+                         // but if so, the CAS is guaranteed to fail.
+                         || casTail(t, p))
                     return p;
                 else
                     continue restartFromTail;
@@ -1179,7 +1176,7 @@ public class ConcurrentLinkedDeque<E>
         for (;;)
             for (Node<E> t = tail, p = t, q;;) {
                 if ((q = p.next) != null &&
-                        (q = (p = q).next) != null)
+                    (q = (p = q).next) != null)
                     // Check for tail updates every other hop.
                     // If p == q, we are sure to follow tail instead.
                     p = (t != (t = tail)) ? t : q;
@@ -1398,7 +1395,7 @@ public class ConcurrentLinkedDeque<E>
      * @param s the stream
      */
     private void writeObject(java.io.ObjectOutputStream s)
-            throws java.io.IOException {
+        throws java.io.IOException {
 
         // Write out any hidden stuff
         s.defaultWriteObject();
@@ -1419,7 +1416,7 @@ public class ConcurrentLinkedDeque<E>
      * @param s the stream
      */
     private void readObject(java.io.ObjectInputStream s)
-            throws java.io.IOException, ClassNotFoundException {
+        throws java.io.IOException, ClassNotFoundException {
         s.defaultReadObject();
 
         // Read in elements until trailing null sentinel found
@@ -1462,9 +1459,9 @@ public class ConcurrentLinkedDeque<E>
             UNSAFE = getUnsafe();
             Class k = ConcurrentLinkedDeque.class;
             headOffset = UNSAFE.objectFieldOffset
-                    (k.getDeclaredField("head"));
+                (k.getDeclaredField("head"));
             tailOffset = UNSAFE.objectFieldOffset
-                    (k.getDeclaredField("tail"));
+                (k.getDeclaredField("tail"));
         } catch (Exception e) {
             throw new Error(e);
         }
@@ -1482,5 +1479,4 @@ public class ConcurrentLinkedDeque<E>
         }
         return null;
     }
-
 }
