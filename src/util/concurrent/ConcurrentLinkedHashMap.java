@@ -3,9 +3,7 @@ package util.concurrent;
 import util.Pair;
 import util.concurrent.ConcurrentLinkedDeque.Node;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
 
@@ -84,8 +82,7 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
     }
 
     public Set<K> keySet() {
-        // FIXME
-        throw new RuntimeException();
+        return new KeySet();
     }
 
     public Collection<V> values() {
@@ -152,6 +149,49 @@ public class ConcurrentLinkedHashMap<K, V> implements ConcurrentMap<K, V> {
     public V replace(K key, V value) {
         // FIXME
         throw new RuntimeException();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected class KeySet extends AbstractSet<K> {
+
+        class KeyIterator implements Iterator<K> {
+
+            @SuppressWarnings("unchecked")
+            Iterator<K> delegate_ = (Iterator<K>) MRU_.iterator();
+
+            K val;
+
+            @Override
+            public boolean hasNext() {
+                return delegate_.hasNext();
+            }
+
+            @Override
+            public K next() {
+                return val = delegate_.next();
+            }
+
+            @Override
+            public void remove() {
+                assert val != null;
+                delegate_.remove();
+                storage_.remove(val);
+            }
+
+        }
+
+        @Override
+        public Iterator<K> iterator() {
+            return new KeyIterator();
+        }
+
+        @Override
+        public int size() {
+            assert MRU_.size() == storage_.size();
+            return storage_.size();
+        }
+
     }
 
 
